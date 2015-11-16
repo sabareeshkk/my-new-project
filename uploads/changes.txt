@@ -1,0 +1,32 @@
+from .models import Case, CaseLog, Email
+
+case = Case.objects.get(pk=pk)
+stock = case.stake_holders.all().filter(kind='prospect')
+email = Email()
+email.fk_case = case
+email.mail_content = case.mail_body
+email.save()
+
+/////////////////////////////////
+class Email(models.Model):
+    fk_case = models.ForeignKey(Case, related_name='emails')
+    mail_content = models.TextField(null=True, blank=True)
+    date = models.DateField(default=timezone.now)
+
+    def __unicode__(self):
+        return str(self.fk_case)
+
+///////////////////////////////
+from .models import Case, CaseLog, StakeHolder, Attachment, Email
+
+class EmailFormAdmin(forms.ModelForm):
+    mail_content = forms.CharField(widget=CKEditorWidget(), required=False)
+
+    class Meta:
+        model = Email
+        exclude = []
+
+class EmailAdmin(admin.ModelAdmin):
+     form = EmailFormAdmin
+
+admin.site.register(Email, EmailAdmin)
